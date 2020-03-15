@@ -1,0 +1,72 @@
+Firewall
+
+What is azure firewall--Azure firewall is stateful firewall, highly available (no additional load balancers are required and there's nothing you need to configure.), highly scalable.
+
+It is paas offering
+
+cost
+
+1. fixed
+2. inbound data transfer and outbound data transfer
+
+
+1. Create resource group
+2. Create virtual networks
+3. Create another subnet-which will be deploying server used for testing
+4. Creat virtual machine
+	1. deploy on another subnet
+	2. Inbound port is None
+	3. Public IP is none
+
+After creating VM, Public Ip address is not created, Networking-> Goto NIC->IP config, private ipaddress is created as dynamic.
+
+Note:- Make it is static instead of dynamic
+
+5. Create Firewall
+
+	1. Add NAT  (network application traffic) rule collection
+		Name, Priority-100
+		Rules
+		name-RDPRule
+		Protocol-TCP
+		Source Type-Ip address
+		Source - *
+		Destination Address- Firewall Public address
+		Port Number-	3389
+		Translated Address- VM Private address
+		Translated port Number-	3389
+
+6. Login to VM with firewall public ipaddress (mstsc)
+
+Now you are able to access all the websites --bbc.com, google.com...
+
+To block the sites, create a route table
+
+
+7. Create Route Tables
+
+Do the configuration after creating the route table
+
+I) Route
+
+	1. RouteName--Firewall_RouteTable
+	2. Adress Prefix--0.0.0.0/0
+	3. Next hop types-Virtual appliance (azure firewall)
+	4. next hop address-Give firewall private ip address
+II) Subnets
+
+	Associate-> Vnet-give firewall_vnet, Subnet-Server1
+
+8. Now goto VM
+now you will not be access any website--all is blocked
+
+9. To access the websites BBC or google
+
+goto firewall-> rule-> application rule collection
+
+	1. Application Collection Name
+	2. Priority-100
+	3. Action-Allow
+	4. Target FQDNs-name (allow bbc), source (*), Protocol(http,https), Target FQDNs(*bbc.com)
+
+fully qualified domain names (FQDN) including wild cards.
